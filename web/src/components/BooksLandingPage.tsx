@@ -100,9 +100,19 @@ const BooksLandingPage = ({ onBookClick }: BooksLandingPageProps) => {
 
   // Skeleton loader for initial load
   const renderSkeletons = () => (
-    <Grid container spacing={3}>
+    <Grid 
+      container 
+      spacing={3}
+      sx={{
+        // Ensure maximum of 4 columns on larger screens
+        '& > .MuiGrid2-root': {
+          minWidth: { xs: '100%', sm: '50%', md: '33.33%', lg: '25%', xl: '25%' },
+          maxWidth: { xs: '100%', sm: '50%', md: '33.33%', lg: '25%', xl: '25%' },
+        }
+      }}
+    >
       {Array.from({ length: 12 }, (_, i) => (
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={`skeleton-${i}`}>
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }} key={`skeleton-${i}`}>
           <Box>
             <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
             <Skeleton variant="text" height={32} sx={{ mt: 1 }} />
@@ -121,7 +131,7 @@ const BooksLandingPage = ({ onBookClick }: BooksLandingPageProps) => {
   )
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Box sx={{ width: '100%', py: 4, px: 3 }}>
       {/* Header */}
       <Box mb={4}>
         <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
@@ -146,9 +156,19 @@ const BooksLandingPage = ({ onBookClick }: BooksLandingPageProps) => {
       {books.length === 0 && loading ? (
         renderSkeletons()
       ) : (
-        <Grid container spacing={3}>
+        <Grid 
+          container 
+          spacing={3}
+          sx={{
+            // Ensure maximum of 4 columns on larger screens
+            '& > .MuiGrid2-root': {
+              minWidth: { xs: '100%', sm: '50%', md: '33.33%', lg: '25%', xl: '25%' },
+              maxWidth: { xs: '100%', sm: '50%', md: '33.33%', lg: '25%', xl: '25%' },
+            }
+          }}
+        >
           {books.map((book) => (
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={book.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 3 }} key={book.id}>
               <BookTile book={book} onClick={onBookClick} />
             </Grid>
           ))}
@@ -182,7 +202,7 @@ const BooksLandingPage = ({ onBookClick }: BooksLandingPageProps) => {
           </Typography>
         </Box>
       )}
-    </Container>
+    </Box>
   )
 }
 
