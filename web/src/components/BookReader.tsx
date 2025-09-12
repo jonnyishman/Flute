@@ -107,9 +107,6 @@ const BookReader = ({ book: propBook, chapter: propChapter, onBackToLibrary }: B
     endReadingSession 
   } = useBookProgress()
   
-  // Refs for touch handling
-  const touchStartRef = useRef<{ x: number; time: number } | null>(null)
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
   const [state, setState] = useState<BookReaderState>({
     book: propBook || null,
@@ -222,40 +219,8 @@ const BookReader = ({ book: propBook, chapter: propChapter, onBackToLibrary }: B
     }
   }, [state.book, state.currentChapter, updateBookProgress])
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (!isMobile) return
-    touchStartRef.current = {
-      x: e.touches[0].clientX,
-      time: Date.now()
-    }
-  }, [isMobile])
-
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (!isMobile || !touchStartRef.current) return
-    
-    const endX = e.changedTouches[0].clientX
-    const endTime = Date.now()
-    const deltaX = touchStartRef.current.x - endX
-    const deltaTime = endTime - touchStartRef.current.time
-    
-    // Debounce rapid swipes
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current)
-    }
-    
-    // Swipe threshold: 50px distance, max 500ms duration
-    if (Math.abs(deltaX) > 50 && deltaTime < 500) {
-      debounceTimeoutRef.current = setTimeout(() => {
-        if (deltaX > 0) {
-          changeChapter(1) // Swipe left - next chapter
-        } else {
-          changeChapter(-1) // Swipe right - previous chapter  
-        }
-      }, 100)
-    }
-    
-    touchStartRef.current = null
-  }, [isMobile, changeChapter])
+  // Mobile swipe handlers removed - horizontal swiping now scrolls through text content
+  // Chapter navigation on mobile is handled through the navigation buttons in the toolbar
 
   // Keyboard navigation
   useEffect(() => {
@@ -416,7 +381,7 @@ const BookReader = ({ book: propBook, chapter: propChapter, onBackToLibrary }: B
         tabIndex={-1}
         sx={{
           flexGrow: 1,
-          overflow: isMobile ? 'hidden' : 'auto',
+          overflow: 'auto',
           p: { xs: 2, md: 4 },
           maxWidth: '800px',
           margin: '0 auto',
@@ -425,11 +390,9 @@ const BookReader = ({ book: propBook, chapter: propChapter, onBackToLibrary }: B
           lineHeight: readerSettings.lineSpacing,
           fontFamily: 'Georgia, serif',
           ...(isMobile && {
-            touchAction: 'pan-y',
+            touchAction: 'pan-x pan-y',
           })
         }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
         aria-live="polite"
         aria-label={`Reading ${state.book.title}, Chapter ${state.currentChapter}`}
       >
@@ -482,7 +445,7 @@ const BookReader = ({ book: propBook, chapter: propChapter, onBackToLibrary }: B
             {isMobile && (
               <Box sx={{ textAlign: 'center', mt: 4, color: 'text.secondary' }}>
                 <Typography variant="caption">
-                  Swipe left for next chapter, right for previous • Use arrow keys for keyboard navigation
+                  Use chapter navigation buttons in the toolbar • Scroll horizontally through text
                 </Typography>
               </Box>
             )}
